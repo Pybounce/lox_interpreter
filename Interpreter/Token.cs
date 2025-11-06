@@ -1,20 +1,20 @@
 public class Token
 {
-    readonly TokenType _type;
-    readonly string _lexeme;
-    readonly Object _literal;
-    readonly int _line;
+    public readonly TokenType TokenType;
+    public readonly string Lexeme;
+    public readonly Object Literal;
+    public readonly int Line;
 
     public Token(TokenType type, string lexeme, Object literal, int line)
     {
-        this._type = type;
-        this._lexeme = lexeme;
-        this._literal = literal;
-        this._line = line;
+        this.TokenType = type;
+        this.Lexeme = lexeme;
+        this.Literal = literal;
+        this.Line = line;
     }
 
     public override string ToString()
     {
-        return $"Type {_type} Lexeme {_lexeme} Literal {_literal}";
+        return $"Type {TokenType} Lexeme {Lexeme} Literal {Literal}";
     }
 }

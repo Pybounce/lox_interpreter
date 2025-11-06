@@ -9,6 +9,7 @@ class Lox
 
     static void Main(string[] args)
     {
+
         if (args.Length == 1)
         {
             RunFile(args[0]);
