@@ -191,4 +191,17 @@ public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Nothing>
             _environment = previousEnv;
         }
     }
+
+    public Nothing VisitIfStmt(Stmt.If stmt)
+    {
+        if (IsTruthy(Evaluate(stmt.Condition)))
+        {
+            Execute(stmt.ThenBranch);
+        }
+        else if (stmt.ElseBranch != null)
+        {
+            Execute(stmt.ElseBranch);
+        }
+        return new Nothing();
+    }
 }

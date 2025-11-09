@@ -1,4 +1,3 @@
-
 public abstract class Stmt
 {
     public abstract R Accept<R>(Visitor<R> visitor);
@@ -8,6 +7,7 @@ public abstract class Stmt
         public R VisitPrintStmt(Print stmt);
         public R VisitVarStmt(Var stmt);
         public R VisitBlockStmt(Block stmt);
+        public R VisitIfStmt(If stmt);
     }
     public class Expression : Stmt
     {
@@ -57,6 +57,22 @@ public abstract class Stmt
         public Block(List<Stmt> statements) : base()
         {
             this.statements = statements;
+        }
+    }
+    public class If : Stmt
+    {
+        public readonly Expr Condition;
+        public readonly Stmt ThenBranch;
+        public readonly Stmt? ElseBranch;
+        public override R Accept<R>(Visitor<R> visitor)
+        {
+            return visitor.VisitIfStmt(this);
+        }
+        public If(Expr Condition, Stmt ThenBranch, Stmt? ElseBranch) : base()
+        {
+            this.Condition = Condition;
+            this.ThenBranch = ThenBranch;
+            this.ElseBranch = ElseBranch;
         }
     }
 }
