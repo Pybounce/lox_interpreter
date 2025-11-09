@@ -2,8 +2,18 @@
 
 public class Environment
 {
+    private readonly Environment? _enclosing;
     private readonly Dictionary<string, object> _values = new Dictionary<string, object>();
 
+    public Environment()
+    {
+        _enclosing = null;
+    }
+
+    public Environment(Environment enclosing)
+    {
+        _enclosing = enclosing;
+    }
 
     public void Define(string name, object value)
     {
@@ -17,6 +27,8 @@ public class Environment
             return value;
         }
 
+        if (_enclosing != null) { return _enclosing.Get(token); }
+
         throw new RuntimeError(token, $"Undefined variable '{token.Lexeme}'.");
     }
     public void Assign(Token name, object value)
@@ -26,6 +38,8 @@ public class Environment
             _values[name.Lexeme] = value;
             return;
         }
+
+        _enclosing?.Assign(name, value);
 
         throw new RuntimeError(name, $"Undefined variable '{name.Lexeme}'.");
     }

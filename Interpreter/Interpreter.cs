@@ -167,4 +167,28 @@ public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Nothing>
         _environment.Assign(expr.name, value);
         return value;
     }
+
+    public Nothing VisitBlockStmt(Stmt.Block stmt)
+    {
+        ExecuteBlock(stmt.statements, new Environment(_environment));
+        return new Nothing();
+    }
+
+    private void ExecuteBlock(List<Stmt> statements, Environment environment)
+    {
+        var previousEnv = _environment;
+
+        try
+        {
+            _environment = environment;
+            foreach (var statement in statements)
+            {
+                Execute(statement);
+            }
+        }
+        finally
+        {
+            _environment = previousEnv;
+        }
+    }
 }
