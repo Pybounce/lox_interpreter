@@ -160,4 +160,11 @@ public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Nothing>
     {
         return _environment.Get(expr.name);
     }
+
+    public object VisitAssignExpr(Expr.Assign expr)
+    {
+        var value = Evaluate(expr.value);
+        _environment.Assign(expr.name, value);
+        return value;
+    }
 }
