@@ -1,10 +1,19 @@
 
+using System.Security.Cryptography.X509Certificates;
+
 public readonly struct Nothing { }
 
 public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Nothing>
 {
+    public readonly Environment Globals = new Environment();
+    private Environment _environment;
 
-    private Environment _environment = new Environment();
+    public Interpreter()
+    {
+        Globals.Define("clock", new NativeClock());
+
+        _environment = Globals;
+    }
 
     public void Interpret(List<Stmt> statements)
     {
@@ -174,7 +183,7 @@ public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Nothing>
         return new Nothing();
     }
 
-    private void ExecuteBlock(List<Stmt> statements, Environment environment)
+    public void ExecuteBlock(List<Stmt> statements, Environment environment)
     {
         var previousEnv = _environment;
 
@@ -227,6 +236,37 @@ public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Nothing>
             Execute(stmt.Body);
         }
 
+        return new Nothing();
+    }
+
+    public object VisitCallExpr(Expr.Call expr)
+    {
+        var callee = Evaluate(expr.Callee);
+        var arguments = new List<object>();
+        foreach (var argument in expr.Arguments)
+        {
+            arguments.Add(Evaluate(argument));
+        }
+
+        if (!(callee is LoxCallable)) 
+        { 
+            throw new RuntimeError(expr.Paren, "Can only call functions and classes."); 
+        }
+
+        var function = (LoxCallable)callee;
+
+        if (function.Arity() != arguments.Count)
+        {
+            throw new RuntimeError(expr.Paren, $"Expected {function.Arity()} arguments but got {arguments.Count}.");
+        }
+
+        return function.Call(this, arguments);
+    }
+
+    public Nothing VisitFunctionStmt(Stmt.Function stmt)
+    {
+        var function = new LoxFunction(stmt);
+        _environment.Define(stmt.Name.Lexeme, function);
         return new Nothing();
     }
 }

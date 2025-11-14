@@ -1,3 +1,14 @@
-for (var a = 0; a <= 10; a = a + 2) {
+
+var start = clock();
+
+fun printRange(start, end) {
+  for (var a = start; a < end; a = a + 1) {
     print a;
+  }
 }
+
+printRange(0, 2000000);
+
+var end = clock();
+
+print (end - start);

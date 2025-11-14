@@ -17,7 +17,8 @@ class ASTGenerator
             "Unary : Token op, Expr right",
             "Variable : Token name",
             "Assign : Token name, Expr value",
-            "Logical : Expr Left, Token Op, Expr Right"
+            "Logical : Expr Left, Token Op, Expr Right",
+            "Call : Expr Callee, Token Paren, List<Expr> Arguments"
         };
         DefineAst(Directory.GetCurrentDirectory(), "Expr", types);
 
@@ -28,7 +29,8 @@ class ASTGenerator
             "Var : Token name, Expr initialiser",
             "Block : List<Stmt> statements",
             "If : Expr Condition, Stmt ThenBranch, Stmt? ElseBranch",
-            "While : Expr Condition, Stmt Body"
+            "While : Expr Condition, Stmt Body",
+            "Function : Token Name, List<Token> Params, List<Stmt> Body"
         });
 
     }

@@ -9,6 +9,7 @@ public R VisitVarStmt(Var stmt);
 public R VisitBlockStmt(Block stmt);
 public R VisitIfStmt(If stmt);
 public R VisitWhileStmt(While stmt);
+public R VisitFunctionStmt(Function stmt);
 }
 public class Expression: Stmt
 {
@@ -87,6 +88,22 @@ return visitor.VisitWhileStmt(this);
 public While(Expr Condition, Stmt Body): base()
 {
 this.Condition = Condition;
+this.Body = Body;
+}
+}
+public class Function: Stmt
+{
+public readonly Token Name;
+public readonly List<Token> Params;
+public readonly List<Stmt> Body;
+public override R Accept<R>(Visitor<R> visitor)
+{
+return visitor.VisitFunctionStmt(this);
+}
+public Function(Token Name, List<Token> Params, List<Stmt> Body): base()
+{
+this.Name = Name;
+this.Params = Params;
 this.Body = Body;
 }
 }

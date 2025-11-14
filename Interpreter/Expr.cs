@@ -10,6 +10,7 @@ public R VisitUnaryExpr(Unary expr);
 public R VisitVariableExpr(Variable expr);
 public R VisitAssignExpr(Assign expr);
 public R VisitLogicalExpr(Logical expr);
+public R VisitCallExpr(Call expr);
 }
 public class Binary: Expr
 {
@@ -105,6 +106,22 @@ public Logical(Expr Left, Token Op, Expr Right): base()
 this.Left = Left;
 this.Op = Op;
 this.Right = Right;
+}
+}
+public class Call: Expr
+{
+public readonly Expr Callee;
+public readonly Token Paren;
+public readonly List<Expr> Arguments;
+public override R Accept<R>(Visitor<R> visitor)
+{
+return visitor.VisitCallExpr(this);
+}
+public Call(Expr Callee, Token Paren, List<Expr> Arguments): base()
+{
+this.Callee = Callee;
+this.Paren = Paren;
+this.Arguments = Arguments;
 }
 }
 }

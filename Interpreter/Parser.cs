@@ -28,6 +28,7 @@ public class Parser
     {
         try
         {
+            if (MatchAny(TokenType.FUN)) { return Function("function"); }
             if (MatchAny(TokenType.VAR)) { return VarDeclaration(); }
             return Statement();
         }
@@ -36,6 +37,26 @@ public class Parser
             Synchronise();
             return null;
         }
+    }
+
+    private Stmt Function(string kind)
+    {
+        var name = Consume(TokenType.IDENTIFIER, $"Expect {kind} name.");
+        Consume(TokenType.LEFT_PAREN, $"Expect '(' after {kind} name.");
+
+        var parameters = new List<Token>();
+        if (!Check(TokenType.RIGHT_PAREN))
+        {
+            do
+            {
+                if (parameters.Count >= 255) { Error(Peek(), "Cannot exceed 255 parameters."); }
+                parameters.Add(Consume(TokenType.IDENTIFIER, "Expect parameter name."));
+            } while (MatchAny(TokenType.COMMA));
+        }
+        Consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
+        Consume(TokenType.LEFT_BRACE, $"Expect '{{' before {kind} body.");
+        var body = Block();
+        return new Stmt.Function(name, parameters, body);
     }
 
     private Stmt VarDeclaration()
@@ -297,9 +318,45 @@ public class Parser
             return new Expr.Unary(op, right);
         }
 
-        return Primary();
+        return Call();
     }
     
+    private Expr Call()
+    {
+        var expr = Primary();
+
+        while (true)
+        {
+            if (MatchAny(TokenType.LEFT_PAREN))
+            {
+                expr = FinishCall(expr);
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return expr;
+    }
+
+    private Expr FinishCall(Expr callee)
+    {
+        var arguments = new List<Expr>();
+
+        if (!Check(TokenType.RIGHT_PAREN))
+        {
+            do
+            {
+                if (arguments.Count >= 255) { Error(Peek(), "Cannot have more than 255 arguments."); }
+
+                arguments.Add(Expression());
+            } while (MatchAny(TokenType.COMMA));
+        }
+        var paren = Consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.");
+        return new Expr.Call(callee, paren, arguments);
+    }
+
     private Expr Primary()
     {
         if (MatchAny(TokenType.FALSE)) { return new Expr.Literal(false); }
