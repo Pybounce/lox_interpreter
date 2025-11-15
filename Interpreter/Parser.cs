@@ -85,7 +85,6 @@ public class Parser
                 case TokenType.FOR:
                 case TokenType.IF:
                 case TokenType.WHILE:
-                case TokenType.PRINT:
                 case TokenType.RETURN:
                     return;
             }
@@ -97,7 +96,6 @@ public class Parser
     {
         if (MatchAny(TokenType.FOR)) { return ForStatement(); }
         if (MatchAny(TokenType.IF)) { return IfStatement(); }
-        if (MatchAny(TokenType.PRINT)) { return PrintStatement(); }
         if (MatchAny(TokenType.RETURN)) { return ReturnStatement(); }
         if (MatchAny(TokenType.WHILE)) { return WhileStatement(); }
         if (MatchAny(TokenType.LEFT_BRACE)) { return new Stmt.Block(Block()); }
@@ -203,13 +201,6 @@ public class Parser
 
         Consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
         return statements;
-    }
-
-    private Stmt PrintStatement()
-    {
-        var value = Expression();
-        Consume(TokenType.SEMICOLON, "Expect ';' after value.");
-        return new Stmt.Print(value);
     }
     
     private Stmt ExpressionStatement()

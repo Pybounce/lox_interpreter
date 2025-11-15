@@ -17,7 +17,7 @@ public class LoxFunction : LoxCallable
         return _declaration.Params.Count;
     }
 
-    public object Call(Interpreter interpreter, List<object> args)
+    public object Call(Interpreter interpreter, Token paren, List<object> args)
     {
         var environment = new Environment(_closure);
         for (int i = 0; i < _declaration.Params.Count; i++)

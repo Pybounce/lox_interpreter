@@ -25,7 +25,6 @@ class ASTGenerator
         DefineAst(Directory.GetCurrentDirectory(), "Stmt", new List<string>
         {
             "Expression : Expr expression",
-            "Print : Expr expression",
             "Var : Token name, Expr initialiser",
             "Block : List<Stmt> statements",
             "If : Expr Condition, Stmt ThenBranch, Stmt? ElseBranch",

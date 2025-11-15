@@ -1,11 +1,14 @@
+
 namespace lox.native_functions;
 
-public class ToString : LoxCallable
+
+public class PrintLine : LoxCallable
 {
     public int Arity() => 1;
 
     public object Call(Interpreter interpreter, Token paren, List<object> args)
     {
-        return args[0].ToString();
+        Console.WriteLine(args[0].ToString());
+        return null;
     }
 }

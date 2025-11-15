@@ -12,9 +12,11 @@ public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Nothing>
     {
         Globals.Define("clock", new lox.native_functions.Clock());
         Globals.Define("read_line", new lox.native_functions.ReadLine());
-        Globals.Define("random_range_int", new lox.native_functions.RandomRange());
+        Globals.Define("random_range_rounded", new lox.native_functions.RandomRangeRounded());
         Globals.Define("to_double", new lox.native_functions.ToDouble());
         Globals.Define("to_string", new lox.native_functions.ToString());
+        Globals.Define("print", new lox.native_functions.Print());
+        Globals.Define("print_line", new lox.native_functions.PrintLine());
 
         _environment = Globals;
     }
@@ -150,13 +152,6 @@ public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Nothing>
         return new Nothing();
     }
 
-    public Nothing VisitPrintStmt(Stmt.Print stmt)
-    {
-        var value = Evaluate(stmt.expression);
-        Console.WriteLine(Stringify(value));
-        return new Nothing();
-    }
-
     public Nothing VisitVarStmt(Stmt.Var stmt)
     {
         object value = null;
@@ -264,7 +259,7 @@ public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Nothing>
             throw new RuntimeError(expr.Paren, $"Expected {function.Arity()} arguments but got {arguments.Count}.");
         }
 
-        return function.Call(this, arguments);
+        return function.Call(this, expr.Paren, arguments);
     }
 
     public Nothing VisitFunctionStmt(Stmt.Function stmt)

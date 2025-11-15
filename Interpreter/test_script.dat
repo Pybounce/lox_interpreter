@@ -3,22 +3,24 @@ var score = 0;
 
 
 while (true) {
-    var target = to_double(random_range_int(0, 20));
+    var target = to_double(random_range_rounded(0, 20));
     var guess = nil;
-
-    print "Guess the number between 0-20";
+    
+    print_line("");
+    print_line("Guess the number between 0-20");
+    print("Guess: ");
     guess = to_double(read_line());
 
 
     while (guess != target) {
-        print "";
-        print to_string(guess) + " was incorrect!";
-        print "Guess again below:";
+        print_line("");
+        print_line(to_string(guess) + " was incorrect!");
+        print("Guess: ");
         guess = to_double(read_line());
     }
-    print "";
+    print_line("");
 
     score = score + 1;
-    print to_string(guess) + " is correct!";
-    print "Your score is now " + to_string(score);
+    print_line(to_string(guess) + " is correct!");
+    print_line("Your score is now " + to_string(score));
 }

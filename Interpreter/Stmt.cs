@@ -4,7 +4,6 @@ public abstract R Accept<R>(Visitor<R> visitor);
 public interface Visitor<R>
 {
 public R VisitExpressionStmt(Expression stmt);
-public R VisitPrintStmt(Print stmt);
 public R VisitVarStmt(Var stmt);
 public R VisitBlockStmt(Block stmt);
 public R VisitIfStmt(If stmt);
@@ -20,18 +19,6 @@ public override R Accept<R>(Visitor<R> visitor)
 return visitor.VisitExpressionStmt(this);
 }
 public Expression(Expr expression): base()
-{
-this.expression = expression;
-}
-}
-public class Print: Stmt
-{
-public readonly Expr expression;
-public override R Accept<R>(Visitor<R> visitor)
-{
-return visitor.VisitPrintStmt(this);
-}
-public Print(Expr expression): base()
 {
 this.expression = expression;
 }
