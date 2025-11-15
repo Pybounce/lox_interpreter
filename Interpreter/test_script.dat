@@ -1,9 +1,24 @@
-fun sqr(x) {
-    return x * x;
+
+var score = 0;
+
+
+while (true) {
+    var target = to_double(random_range_int(0, 20));
+    var guess = nil;
+
+    print "Guess the number between 0-20";
+    guess = to_double(read_line());
+
+
+    while (guess != target) {
+        print "";
+        print to_string(guess) + " was incorrect!";
+        print "Guess again below:";
+        guess = to_double(read_line());
+    }
+    print "";
+
+    score = score + 1;
+    print to_string(guess) + " is correct!";
+    print "Your score is now " + to_string(score);
 }
-
-print sqr(1);
-print sqr(2);
-print sqr(3);
-
-

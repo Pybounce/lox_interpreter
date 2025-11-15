@@ -1,4 +1,6 @@
 
+using System.Runtime.InteropServices;
+
 public readonly struct Nothing { }
 
 public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Nothing>
@@ -8,7 +10,11 @@ public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Nothing>
 
     public Interpreter()
     {
-        Globals.Define("clock", new NativeClock());
+        Globals.Define("clock", new lox.native_functions.Clock());
+        Globals.Define("read_line", new lox.native_functions.ReadLine());
+        Globals.Define("random_range_int", new lox.native_functions.RandomRange());
+        Globals.Define("to_double", new lox.native_functions.ToDouble());
+        Globals.Define("to_string", new lox.native_functions.ToString());
 
         _environment = Globals;
     }
@@ -72,7 +78,7 @@ public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Nothing>
             case TokenType.LESS_EQUAL:
                 CheckNumberOperands(expr.op, left, right);
                 return (double)left <= (double)right;
-            case TokenType.EQUAL: return IsEqual(left, right);
+            case TokenType.EQUAL_EQUAL: return IsEqual(left, right);
             case TokenType.BANG_EQUAL: return !IsEqual(left, right);
         }
 

@@ -1,6 +1,8 @@
 
+namespace lox.native_functions;
 
-public class NativeClock : LoxCallable
+
+public class Clock : LoxCallable
 {
     public int Arity() => 0;
 
