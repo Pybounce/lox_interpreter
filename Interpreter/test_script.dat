@@ -1,20 +1,25 @@
 
 var score = 0;
-
+var upper_range = 100;
 
 while (true) {
-    var target = to_double(random_range_rounded(0, 20));
+    var target = to_double(random_range_rounded(0, upper_range));
     var guess = nil;
     
     print_line("");
-    print_line("Guess the number between 0-20");
+    print_line("Guess the number between 0-" + to_string(upper_range));
     print("Guess: ");
     guess = to_double(read_line());
 
 
     while (guess != target) {
         print_line("");
-        print_line(to_string(guess) + " was incorrect!");
+        if (guess < target) {
+            print_line(to_string(guess) + " was too low!");
+        }
+        else {
+            print_line(to_string(guess) + " was too high!");
+        }
         print("Guess: ");
         guess = to_double(read_line());
     }
