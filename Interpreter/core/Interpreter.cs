@@ -3,13 +3,25 @@ using System.Runtime.InteropServices;
 
 public readonly struct Nothing { }
 
+public class StackEvent
+{
+    public class StatementEvent: StackEvent
+    {
+        public Stmt Statement;
+        public StatementEvent(Stmt statement)
+        {
+            this.Statement = statement;
+        }
+    }
+    public class UnwrapEnvironment: StackEvent { }
+
+}
 public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Nothing>
 {
     public readonly Environment Globals = new Environment();
     private Environment _environment;
 
-    private List<Stmt> _statementStack = new List<Stmt>();
-
+    private Stack<StackEvent> _statementStack = new Stack<StackEvent>();
     public Interpreter()
     {
         Globals.Define("clock", new lox.native_functions.Clock());
@@ -31,14 +43,35 @@ public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Nothing>
     {
         try
         {
+            statements.Reverse();
             foreach (var stmt in statements)
             {
-                Execute(stmt);
+                _statementStack.Push(new StackEvent.StatementEvent(stmt));
+            }
+            while (_statementStack.Count() > 0)
+            {
+                ExecuteStackEvent(_statementStack.Peek());
             }
         }
         catch (RuntimeError error)
         {
             Lox.RuntimeError(error);
+        }
+    }
+
+    public void ExecuteStackEvent(StackEvent stackEvent) {
+        if (stackEvent is StackEvent.StatementEvent)
+        {
+            var stmtEvent = (StackEvent.StatementEvent)stackEvent;
+            Execute(stmtEvent.Statement);
+        }
+        else if (stackEvent is StackEvent.UnwrapEnvironment)
+        {
+            _statementStack.Pop();
+            if (_environment._enclosing != null)
+            {
+                _environment = _environment._enclosing;
+            }
         }
     }
 
@@ -154,18 +187,20 @@ public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Nothing>
 
     public Nothing VisitExpressionStmt(Stmt.Expression stmt)
     {
+        _statementStack.Pop();
         Evaluate(stmt.expression);
         return new Nothing();
     }
 
     public Nothing VisitVarStmt(Stmt.Var stmt)
     {
+        Console.WriteLine("var");
         object value = null;
         if (stmt.initialiser != null)
         {
             value = Evaluate(stmt.initialiser);
         }
-
+        _statementStack.Pop();
         _environment.Define(stmt.name.Lexeme, value);
         return new Nothing();
     }
@@ -184,37 +219,33 @@ public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Nothing>
 
     public Nothing VisitBlockStmt(Stmt.Block stmt)
     {
+        Console.WriteLine("pop block");
+        _statementStack.Pop();
         ExecuteBlock(stmt.statements, new Environment(_environment));
         return new Nothing();
     }
 
     public void ExecuteBlock(List<Stmt> statements, Environment environment)
     {
-        var previousEnv = _environment;
-
-        try
+        _environment = environment;
+        _statementStack.Push(new StackEvent.UnwrapEnvironment{});
+        for (int i = statements.Count - 1; i >= 0; i--)
         {
-            _environment = environment;
-            foreach (var statement in statements)
-            {
-                Execute(statement);
-            }
-        }
-        finally
-        {
-            _environment = previousEnv;
+            Console.WriteLine("add some block statement");
+            _statementStack.Push(new StackEvent.StatementEvent(statements[i]));
         }
     }
 
     public Nothing VisitIfStmt(Stmt.If stmt)
     {
+        _statementStack.Pop();
         if (IsTruthy(Evaluate(stmt.Condition)))
         {
-            Execute(stmt.ThenBranch);
+            _statementStack.Push(new StackEvent.StatementEvent(stmt.ThenBranch));
         }
         else if (stmt.ElseBranch != null)
         {
-            Execute(stmt.ElseBranch);
+            _statementStack.Push(new StackEvent.StatementEvent(stmt.ElseBranch));
         }
         return new Nothing();
     }
@@ -236,9 +267,16 @@ public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Nothing>
 
     public Nothing VisitWhileStmt(Stmt.While stmt)
     {
-        while (IsTruthy(Evaluate(stmt.Condition)))
+        if (!IsTruthy(Evaluate(stmt.Condition)))
         {
-            Execute(stmt.Body);
+            Console.WriteLine("while stopped");
+            _statementStack.Pop();
+        }
+        else
+        {
+                        Console.WriteLine("while going");
+
+            _statementStack.Push(new StackEvent.StatementEvent(stmt.Body));
         }
 
         return new Nothing();
@@ -270,6 +308,7 @@ public class Interpreter : Expr.Visitor<Object>, Stmt.Visitor<Nothing>
 
     public Nothing VisitFunctionStmt(Stmt.Function stmt)
     {
+        _statementStack.Pop();
         var function = new LoxFunction(stmt, _environment);
         _environment.Define(stmt.Name.Lexeme, function);
         return new Nothing();

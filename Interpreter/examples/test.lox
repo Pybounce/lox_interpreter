@@ -1,0 +1,10 @@
+var a = 0;
+
+fun incrementa() {
+    a = a + 1;
+}
+
+while (a < 5) {
+    print_line(a);
+    incrementa();
+}

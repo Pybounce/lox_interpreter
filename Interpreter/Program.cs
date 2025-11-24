@@ -17,7 +17,7 @@ class Lox
         else if (args.Length == 0) { RunPrompt(); }
         else
         {
-            throw new ArgumentException("Use 'dotnet run --help' for instructions.");
+            throw new ArgumentException("Use 'dotnet run -- --help' for instructions.");
         }
     }
 

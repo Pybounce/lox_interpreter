@@ -2,7 +2,7 @@
 
 public class Environment
 {
-    private readonly Environment? _enclosing;
+    public readonly Environment? _enclosing;
     private readonly Dictionary<string, object> _values = new Dictionary<string, object>();
 
     public Environment()
